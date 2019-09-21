@@ -1,0 +1,4 @@
+.stack-work/
+trialchain-mock.cabal
+*~
+.DS_Store
