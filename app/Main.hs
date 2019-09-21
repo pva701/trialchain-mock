@@ -6,4 +6,4 @@ import TrialChain.App
 import TrialChain.Web
 
 main :: IO ()
-main = runApp Env runServer
+main = flip runApp runServer =<< newEmptyEnv

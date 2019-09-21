@@ -8,6 +8,9 @@ module TrialChain.App.Error
        , WithError
        , throwError
        , toServantError
+
+       -- * Helpers
+       , throwOnNothing
        ) where
 
 import Universum
@@ -74,3 +77,12 @@ toServantError (AppError _callStack errorType) =
     case errorType of
         NotFound             -> err404
         InternalError reason -> err500 { errBody = encodeUtf8 reason }
+
+----------------------------------------------------------------------------
+-- Helpers
+----------------------------------------------------------------------------
+
+-- | Extract the value from a maybe, throwing the given 'AppError' if
+-- the value does not exist
+throwOnNothing :: WithError m => AppErrorType -> Maybe a -> m a
+throwOnNothing err = withFrozenCallStack . maybe (throwError err) pure

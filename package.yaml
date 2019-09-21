@@ -72,7 +72,15 @@ library:
   build-tools:
   - autoexporter
   dependencies:
+    - aeson
+    - aeson-options
+    - base16-bytestring
+    - containers
+    - cryptonite
+    - fmt
+    - memory
     - mtl
+    - persist
     - unliftio
     - servant
     - servant-server
@@ -91,11 +99,16 @@ executables:
 
 tests:
   trialchain-mock-test:
-    main:                Spec.hs
+    main:                Main.hs
     source-dirs:         test
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    build-tools:
+    - hspec-discover
     dependencies:
     - trialchain-mock
+    - aeson
+    - hspec
+    - QuickCheck

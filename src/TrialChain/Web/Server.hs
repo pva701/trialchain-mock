@@ -6,14 +6,12 @@ import Universum
 
 import qualified Network.Wai.Handler.Warp as Warp
 import Servant (Application, Handler, Server, hoistServer, serve, throwError)
-import UnliftIO (UnliftIO (..), MonadUnliftIO)
+import UnliftIO (UnliftIO (..))
 import qualified UnliftIO as UIO
 
 import TrialChain.App
 import TrialChain.Web.API
 import TrialChain.Web.Handlers
-
-type WorkMode m = (MonadUnliftIO m, WithError m)
 
 -- | Helper for running a Warp server on a given listen port in
 -- arbitrary @MonadIO@.
@@ -27,7 +25,7 @@ serveWeb port app = do
 -- | Makes the @Server@ for TrialChain API, given the natural
 -- transformation from the working monad to @Handler@.
 trialChainServer
-  :: forall m. WorkMode m
+  :: forall env m . WorkMode env m
   => (forall a. m a -> Handler a)
   -> Server TrialChainAPI
 trialChainServer nat = hoistServer trialChainAPI nat trialChainHandlers
@@ -44,7 +42,7 @@ convertTrialChainHandler (UnliftIO unlift) action =
         throwServant = Servant.throwError . toServantError . unAppException
 
 -- | Runs the web server which serves TrialChain API.
-runServer :: WorkMode m => m ()
+runServer :: WorkMode env m => m ()
 runServer = do
     unlift <- UIO.askUnliftIO
     let apiServer = trialChainServer $ convertTrialChainHandler unlift

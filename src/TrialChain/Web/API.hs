@@ -6,17 +6,20 @@ module TrialChain.Web.API
 
 import Universum
 
-import Servant.API ((:>), JSON, StdMethod (..), Verb, QueryParam)
+import Servant.API ((:>), JSON, Get, Post, ReqBody)
 import Servant.API.Generic ((:-), AsApi, ToServant)
 
+import TrialChain.Web.Types
+
 data TrialChainEndpoints route = TrialChainEndpoints
-    { tceHelloWorld :: route
-        :- "hello"
-        :> QueryParam "name" Text
-        :> Verb 'GET 200 '[JSON] Text
-    , tceError :: route
-        :- "error"
-        :> Verb 'GET 200 '[JSON] ()
+    { tceBroadcastTx :: route
+        :- "broadcast"
+        :> ReqBody '[JSON] BroadcastTxRequest
+        :> Post '[JSON] BroadcastTxResponse
+    , tceGetTx :: route
+        :- "get_tx"
+        :> ReqBody '[JSON] GetTxRequest
+        :> Get '[JSON] GetTxResponse
     } deriving (Generic)
 
 -- | API type specification.
