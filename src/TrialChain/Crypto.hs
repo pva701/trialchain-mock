@@ -7,6 +7,7 @@ module TrialChain.Crypto
        , Hash
        , toHash
        , Address (..)
+       , unsafeParseAddress
        , PublicKey (..)
        , SecretKey
        , toPublicKey
@@ -59,6 +60,9 @@ newtype Signature a = Signature ByteString
 newtype Address = Address ByteString
     deriving (Eq, Ord, Show, Generic, Persist)
     deriving (FromJSON, ToJSON, Buildable) via UnitHex
+
+unsafeParseAddress :: Text -> Address
+unsafeParseAddress = Address . unHex . unsafeReadHex
 
 -- | Public key.
 newtype PublicKey = PublicKey ByteString

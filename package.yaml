@@ -96,6 +96,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - trialchain-mock
+    - fmt
 
 tests:
   trialchain-mock-test:

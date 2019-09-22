@@ -1,6 +1,7 @@
 module TrialChain.App.Env
        ( Env (..)
-       , newEmptyEnv
+       , newEnv
+       , defaultBalances
        , MempoolVar
        , BalancesVar
        , Has (..)
@@ -12,6 +13,7 @@ import Universum
 import qualified UnliftIO as UIO
 
 import TrialChain.Consensus.Types
+import TrialChain.Crypto
 
 type MempoolVar = TVar Mempool
 type BalancesVar = TVar Balances
@@ -21,8 +23,15 @@ data Env = Env
   , envBalances :: BalancesVar
   }
 
-newEmptyEnv :: MonadIO m => m Env
-newEmptyEnv = Env <$> UIO.newTVarIO (Mempool mempty) <*> UIO.newTVarIO (Balances mempty)
+newEnv :: MonadIO m => Balances -> m Env
+newEnv bals = Env <$> UIO.newTVarIO (Mempool mempty) <*> UIO.newTVarIO bals
+
+defaultBalances :: [(Address, Amount)]
+defaultBalances =
+    [ (unsafeParseAddress "abcdef", 100)
+    , (unsafeParseAddress "10bcaf", 200)
+    , (unsafeParseAddress "abdffe0123", 300)
+    ]
 
 class Has field env where
   obtain :: env -> field

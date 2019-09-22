@@ -9,6 +9,7 @@ module TrialChain.Consensus.Types
        , createTx
        , txId
        , Balances (..)
+       , mkBalances
        , Mempool (..)
        , insertMempool
        ) where
@@ -67,6 +68,9 @@ txId = toHash . txBody
 
 -- | Balances and nonces of addresses.
 newtype Balances = Balances {unBalances :: Map Address (Amount, Nonce)}
+
+mkBalances :: [(Address, Amount)] -> Balances
+mkBalances = Balances . M.fromList . map (second (,0))
 
 -- | Transactions which have been sent so far.
 -- Sequential number of a transaction is also held
