@@ -1,12 +1,19 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# LANGUAGE DerivingVia #-}
 
 module TrialChain.Web.Types
        ( BroadcastTxRequest (..)
        , BroadcastTxResponse
+       , bresId
+       , bresResult
+       , bresError
        , mkBroadcastTxResponse
        , BroadcastTxResponseError (..)
        , GetTxRequest (..)
        , GetTxResponse
+       , gresId
+       , gresResult
+       , gresError
        , mkGetTxResponse
        , GetTxResponseError (..)
        ) where
@@ -30,11 +37,11 @@ data BroadcastTxRequest = BroadcastTxRequest
 
 -- | /broadcast response.
 data BroadcastTxResponse = BroadcastTxResponse
-  { _bresId      :: Int
+  { bresId      :: Int
   -- ^ Corresponding request id.
-  , _bresResult  :: Maybe TxId
+  , bresResult  :: Maybe TxId
   -- ^ Transaction id.
-  , _bresError   :: Maybe BroadcastTxResponseError
+  , bresError   :: Maybe BroadcastTxResponseError
   -- ^ An error which happened during request.
   }
 
@@ -67,11 +74,11 @@ data GetTxRequest = GetTxRequest
 
 -- | /get_tx response.
 data GetTxResponse = GetTxResponse
-  { _gresId     :: Int
+  { gresId     :: Int
   -- ^ Corresponding request id.
-  , _gresResult :: Maybe (Hex Tx)
+  , gresResult :: Maybe (Hex Tx)
   -- ^ Raw transaction in hexadecimal format.
-  , _gresError  :: Maybe GetTxResponseError
+  , gresError  :: Maybe GetTxResponseError
   }
 
 -- | Smart constructor for GetTxResponse

@@ -1,6 +1,10 @@
 module TrialChain.Web.Handlers
        ( trialChainHandlers
        , WorkMode
+
+       -- * For tests
+       , postBroadcastTx
+       , getTx
        ) where
 
 import Universum
@@ -51,8 +55,8 @@ postBroadcastTx BroadcastTxRequest{..} = fmap (mkBroadcastTxResponse breqId) $ r
         case verifyTxAndTransfer tx balances of
             Left e -> pure $ Left $ TxVerificationFailed e
             Right newBalances -> do
-                UIO.modifyTVar mempoolVar (insertMempool tx)
                 UIO.writeTVar balancesVar newBalances
+                UIO.modifyTVar mempoolVar (insertMempool tx)
                 pure $ Right $ txId tx
 
 -- | Get a transaction by its hash.

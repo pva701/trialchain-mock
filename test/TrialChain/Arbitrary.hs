@@ -1,10 +1,15 @@
 module TrialChain.Arbitrary
        ( ValidTx (..)
+       , arbitraryBalances
+       , arbitraryValidTx
+       , chooseSource
+       , chooseDestination
        ) where
 
 import Universum
 
 import Data.List ((!!))
+import qualified Data.Map as M
 import Test.QuickCheck.Gen (Gen)
 import Test.QuickCheck (Arbitrary (..), choose, vectorOf)
 import qualified Data.ByteString as BS
@@ -32,14 +37,35 @@ data ValidTx = ValidTx
   , vBalances :: Balances
   } deriving (Eq, Show)
 
+arbitraryBalances :: Gen Balances
+arbitraryBalances = do
+    num <- choose (1, 10)
+    mkBalances <$> vectorOf num arbitrary
+
+chooseSource :: Balances -> Gen (Address, Amount, Nonce)
+chooseSource (Balances (M.toList -> bals)) = do
+    let !num = length bals
+    (txbSource, (srcBal, txbNonce)) <- (bals !!) <$> choose (0, num - 1)
+    pure (txbSource, srcBal, txbNonce)
+
+chooseDestination :: Balances -> Gen Address
+chooseDestination (Balances (M.toList -> bals)) = do
+    option :: Int <- choose (1, 2)
+    if option == 1 then do
+        let !num = length bals
+        fst . (bals !!) <$> choose (0, num - 1)
+    else
+        arbitrary
+
+arbitraryValidTx :: Balances -> Gen Tx
+arbitraryValidTx balances = do
+    (txbSource, srcBal, txbNonce) <- chooseSource balances
+    txbDestination <- chooseDestination balances
+    txbAmount <- Amount <$> choose (1, fromIntegral srcBal)
+    Tx TxBody{..} <$> arbitrary <*> arbitrary
+
 instance Arbitrary ValidTx where
     arbitrary = do
-        num <- choose (1, 10)
-        bls <- vectorOf num arbitrary
-        (txbSource, srcBal) <- (bls !!) <$> choose (0, num - 1)
-        txbDestination <- fst . (bls !!) <$> choose (0, num - 1)
-        txbAmount <- Amount <$> choose (1, fromIntegral srcBal)
-        let txbNonce = 0
-        vTx <- Tx TxBody{..} <$> arbitrary <*> arbitrary
-        let vBalances = mkBalances bls
+        vBalances <- arbitraryBalances
+        vTx       <- arbitraryValidTx vBalances
         pure $ ValidTx {..}

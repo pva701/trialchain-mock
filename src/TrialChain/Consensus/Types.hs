@@ -19,7 +19,7 @@ import Universum
 import Data.Aeson (FromJSON (..), ToJSON (..))
 import qualified Data.Map as M
 import Data.Persist (Persist (..))
-import Fmt (Buildable (..))
+import Fmt (Buildable (..), (+|), (|+))
 
 import TrialChain.Crypto
 
@@ -40,9 +40,17 @@ data TxBody = TxBody
   -- ^ Nonce of source address.
   , txbDestination :: Address
   -- ^ Destination address, where money will be sent to.
-  , txbAmount       :: Amount
+  , txbAmount      :: Amount
   -- ^ Amount of money to send.
   } deriving (Eq, Ord, Show, Generic)
+
+instance Buildable TxBody where
+    build body@TxBody{..} =
+        "Tx #" +| toHash body |+ " [source: " +| txbSource
+                              |+ ", nonce: " +| txbNonce
+                              |+ ", destination: " +| txbDestination
+                              |+ ", amount: " +| txbAmount
+                              |+ "]"
 
 instance Persist TxBody
 

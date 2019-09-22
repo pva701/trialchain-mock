@@ -112,5 +112,9 @@ tests:
     - trialchain-mock
     - aeson
     - bytestring
+    - containers
+    - fmt
     - hspec
+    - persist
+    - unliftio
     - QuickCheck

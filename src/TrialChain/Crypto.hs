@@ -32,10 +32,9 @@ newtype Hash a = Hash (Digest Blake2b_256)
     deriving (Eq, Ord, Show, Generic, Persist, FromJSON, ToJSON, Buildable)
 
 instance Persist (Digest Blake2b_256) where
-    put x = Persist.put (ByteArray.convert x :: ByteString)
+    put x = Persist.putByteString (ByteArray.convert x :: ByteString)
     get = do
         bytes <- Persist.getBytes 32
-        Persist.eof
         maybe (fail "invalid hash") pure (digestFromByteString bytes)
 
 instance ToJSON (Digest Blake2b_256) where
