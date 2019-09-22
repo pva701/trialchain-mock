@@ -1,7 +1,7 @@
 {- Verification of rules of the consensus algorithm. -}
 
 module TrialChain.Consensus.Verification
-       ( TxVerificationError
+       ( TxVerificationError (..)
        , verifyTxAndTransfer
        ) where
 
@@ -23,6 +23,7 @@ data TxVerificationError
     | SourceAddressNotFound Address
     | NotEnoughBalance Address Amount Amount
     | NonceMismatch Address Nonce Nonce
+    deriving (Eq, Show)
 
 instance Buildable TxVerificationError where
     build (TxInvalidSignature tId sig) = "Transaction #" +| tId |+ " is signed incorrectly with " +| sig |+ "."
@@ -54,8 +55,8 @@ transfer TxBody{..} (Balances bals) = do
         throwError $ NonceMismatch txbSource nonce txbNonce
 
     let bals1 = M.insert txbSource (balance - txbAmount, nonce + 1) bals
-    let (dstBalance, dstNonce) = fromMaybe (0, 0) (M.lookup txbDestionation bals1)
-    pure $ Balances $ M.insert txbDestionation (dstBalance + txbAmount, dstNonce) bals1
+    let (dstBalance, dstNonce) = fromMaybe (0, 0) (M.lookup txbDestination bals1)
+    pure $ Balances $ M.insert txbDestination (dstBalance + txbAmount, dstNonce) bals1
 
 -- | Verify all consensus rules and apply a transaction then.
 verifyTxAndTransfer :: Tx -> Balances -> Either TxVerificationError Balances

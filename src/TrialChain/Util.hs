@@ -29,27 +29,27 @@ newtype Hex a = Hex {unHex :: ByteString}
 type UnitHex = Hex ()
 
 instance ToJSON (Hex a) where
-    toJSON = toJSON . prettyHex
+    toJSON = toJSON . prettyHex . unHex
 
 instance FromJSON (Hex a) where
-    parseJSON = either fail pure . readHex <=< parseJSON @Text
+    parseJSON = either fail (pure . Hex) . readHex <=< parseJSON @Text
 
 instance Buildable (Hex a) where
-    build = pretty . prettyHex
+    build = pretty . prettyHex . unHex
 
 -- | Print a hexadecimal string.
-prettyHex :: Hex a -> Text
-prettyHex = decodeUtf8 . B16.encode . unHex
+prettyHex :: ByteString -> Text
+prettyHex = decodeUtf8 . B16.encode
 
 -- | Parse a hexadecimal string safely.
-readHex :: Text -> Either String (Hex a)
+readHex :: Text -> Either String ByteString
 readHex t = do
     let (res, rest) = B16.decode (encodeUtf8 t)
     if not (null rest) then Left "invalid hex string"
-    else Right (Hex res)
+    else Right res
 
 -- | Parse a hexadecimal string. Call error in case of failure.
-unsafeReadHex :: Text -> Hex a
+unsafeReadHex :: Text -> ByteString
 unsafeReadHex = either (error . fromString) id . readHex
 
 newtype JsonViaBuildable a = JsonViaBuildable a

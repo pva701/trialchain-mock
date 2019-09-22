@@ -45,7 +45,7 @@ instance FromJSON (Digest Blake2b_256) where
     parseJSON = maybe (fail "invalid hash") pure . digestFromByteString <=< fmap unHex . parseJSON
 
 instance Buildable (Digest Blake2b_256) where
-    build = pretty . prettyHex . Hex . ByteArray.convert
+    build = pretty . prettyHex . ByteArray.convert
 
 toHash :: Persist a => a -> Hash a
 toHash = Hash . hash . Persist.encode
@@ -62,7 +62,7 @@ newtype Address = Address ByteString
     deriving (FromJSON, ToJSON, Buildable) via UnitHex
 
 unsafeParseAddress :: Text -> Address
-unsafeParseAddress = Address . unHex . unsafeReadHex
+unsafeParseAddress = Address . unsafeReadHex
 
 -- | Public key.
 newtype PublicKey = PublicKey ByteString
@@ -87,4 +87,7 @@ sign _ _ = Signature $ encodeUtf8 @Text "mock_signature"
 -- | Verify a signature.
 -- This function is just mock always returning true.
 verifySignature :: Persist a => a -> Signature a -> PublicKey -> Bool
-verifySignature _ _ _ = True
+verifySignature _ (Signature bytes) _ =
+    prettyHex bytes /= "ffffffffff"
+    -- consider all signatures valid, but not "ffffffffff",
+    -- which is exploited in tests

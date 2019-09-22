@@ -18,4 +18,4 @@ spec = describe "Hex tests" $ do
         second prettyHex (readHex "0123456789ABCDEF") === Right "0123456789abcdef"
 
     it "Hex JSON roundtrip 1" $
-        eitherDecode @(Hex ()) (encode @Text "0123456789abcdef") === readHex "0123456789abcdef"
+        eitherDecode @(Hex ()) (encode @Text "0123456789abcdef") === second Hex (readHex "0123456789abcdef")

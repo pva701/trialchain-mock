@@ -1,8 +1,8 @@
 {- Types which relate to our simple consensus algorithm. -}
 
 module TrialChain.Consensus.Types
-       ( Nonce
-       , Amount
+       ( Nonce (..)
+       , Amount (..)
        , TxBody (..)
        , Tx (..)
        , TxId
@@ -30,7 +30,7 @@ newtype Nonce = Nonce Word32
 
 -- | Amount of money.
 newtype Amount = Amount Word32
-    deriving (Eq, Ord, Show, Num, Generic, FromJSON, ToJSON, Persist, Buildable)
+    deriving (Eq, Ord, Show, Num, Enum, Real, Integral, Generic, FromJSON, ToJSON, Persist, Buildable)
 
 -- | Transaction body.
 data TxBody = TxBody
@@ -38,7 +38,7 @@ data TxBody = TxBody
   -- ^ Source address, where money will be withdrawn from.
   , txbNonce        :: Nonce
   -- ^ Nonce of source address.
-  , txbDestionation :: Address
+  , txbDestination :: Address
   -- ^ Destination address, where money will be sent to.
   , txbAmount       :: Amount
   -- ^ Amount of money to send.
@@ -68,6 +68,7 @@ txId = toHash . txBody
 
 -- | Balances and nonces of addresses.
 newtype Balances = Balances {unBalances :: Map Address (Amount, Nonce)}
+    deriving (Eq, Show)
 
 mkBalances :: [(Address, Amount)] -> Balances
 mkBalances = Balances . M.fromList . map (second (,0))

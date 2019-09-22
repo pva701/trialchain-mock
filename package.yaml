@@ -111,5 +111,6 @@ tests:
     dependencies:
     - trialchain-mock
     - aeson
+    - bytestring
     - hspec
     - QuickCheck
